@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Converter Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .test-button {
+      background-color: #0070f3;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .test-button:hover {
+      background-color: #0051cc;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+<body>
+  <h1>PDF Converter Test Page</h1>
+  <p>Click the button below to test the PDF conversion API:</p>
+  
+  <button class="test-button" onclick="testConvert()">Convert HTML to PDF</button>
+  
+  <div id="result"></div>
+
+  <script>
+    async function testConvert() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = 'Converting...';
+      resultDiv.className = '';
+
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 40px; }
+            h1 { color: #0070f3; }
+            .content { line-height: 1.6; }
+          </style>
+        </head>
+        <body>
+          <h1>Test PDF Document</h1>
+          <div class="content">
+            <p>This is a test PDF generated from HTML.</p>
+            <p>Generated at: ${new Date().toLocaleString()}</p>
+            <ul>
+              <li>Item 1</li>
+              <li>Item 2</li>
+              <li>Item 3</li>
+            </ul>
+          </div>
+        </body>
+        </html>
+      `;
+
+      try {
+        const response = await fetch('/api/convert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ html }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'test-converted.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        resultDiv.textContent = '✓ PDF generated successfully! Check your downloads.';
+        resultDiv.className = 'success';
+      } catch (error) {
+        resultDiv.textContent = `✗ Error: ${error.message}`;
+        resultDiv.className = 'error';
+      }
+    }
+  </script>
+</body>
+</html>

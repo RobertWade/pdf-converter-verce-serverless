@@ -1,0 +1,16 @@
+{
+  "name": "pdf-converter-verce-serverless",
+  "version": "1.0.0",
+  "description": "Serverless Vercel function that converts HTML to PDF",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sparticuz/chromium": "^141.0.0",
+    "puppeteer-core": "^24.30.0"
+  }
+}
