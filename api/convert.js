@@ -1,5 +1,9 @@
 const chromium = require('@sparticuz/chromium');
-const puppeteer = require('puppeteer-core');
+
+const isServerlessEnv = Boolean(process.env.AWS_REGION || process.env.VERCEL);
+const puppeteer = isServerlessEnv
+  ? require('puppeteer-core')
+  : require('puppeteer');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -15,13 +19,20 @@ module.exports = async (req, res) => {
   let browser = null;
 
   try {
-    // Launch browser with chromium
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
+    const launchOptions = isServerlessEnv
+      ? {
+          // Chromium build tuned for AWS/Vercel
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+        }
+      : {
+          // Let local Puppeteer manage the Chrome binary
+          headless: 'new',
+        };
+
+    browser = await puppeteer.launch(launchOptions);
 
     const page = await browser.newPage();
     
