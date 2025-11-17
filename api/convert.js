@@ -36,12 +36,15 @@ module.exports = async (req, res) => {
       printBackground: true,
     });
 
+    // Convert to Buffer to ensure proper binary serialization
+    const pdfBuffer = Buffer.from(pdf);
+
     // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=converted.pdf');
     
     // Send the PDF
-    return res.status(200).send(pdf);
+    return res.status(200).send(pdfBuffer);
   } catch (error) {
     console.error('Error generating PDF:', error);
     return res.status(500).json({ 
